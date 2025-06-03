@@ -1,5 +1,6 @@
 package net.colinsuther.ambientmod;
 
+import net.colinsuther.ambientmod.particle.ModParticles;
 import net.fabricmc.api.ModInitializer;
 
 import org.slf4j.Logger;
@@ -12,6 +13,6 @@ public class AmbientMod implements ModInitializer {
 
 	@Override
 	public void onInitialize() {
-
+		ModParticles.registerParticles();
 	}
 }
