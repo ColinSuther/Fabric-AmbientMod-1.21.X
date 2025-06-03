@@ -1,0 +1,40 @@
+{
+	"schemaVersion": 1,
+	"id": "ambientmod",
+	"version": "${version}",
+	"name": "Ambient Mod",
+	"description": "This is a mod that adds ambient particles and sounds.",
+	"authors": [
+		"Me!"
+	],
+	"contact": {
+		"homepage": "https://fabricmc.net/",
+		"sources": "https://github.com/FabricMC/fabric-example-mod"
+	},
+	"license": "CC0-1.0",
+	"icon": "assets/ambientmod/icon.png",
+	"environment": "*",
+	"entrypoints": {
+		"main": [
+			"net.colinsuther.ambientmod.AmbientMod"
+		],
+		"fabric-datagen": [
+			"net.colinsuther.ambientmod.AmbientModDataGenerator"
+		],
+		"client": [
+			"net.colinsuther.ambientmod.AmbientModClient"
+		]
+	},
+	"mixins": [
+		"ambientmod.mixins.json"
+	],
+	"depends": {
+		"fabricloader": ">=0.16.14",
+		"minecraft": "~1.21",
+		"java": ">=21",
+		"fabric-api": "*"
+	},
+	"suggests": {
+		"another-mod": "*"
+	}
+}
