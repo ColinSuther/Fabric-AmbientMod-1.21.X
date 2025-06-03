@@ -9,15 +9,12 @@ import net.minecraft.util.Identifier;
 
 public class ModParticles {
 
-    public static final SimpleParticleType HANDHELD_FLAME_PARTICLE =
-            registerParticle("handheld_flame_particle", FabricParticleTypes.simple());
-
     //Torch ember particle
     public static final SimpleParticleType TORCH_EMBER_PARTICLE =
             registerParticle("torch_ember_particle", FabricParticleTypes.simple());
 
     //Now that we've registered our particle, we need to register our factory in our client class
-    // so that we can use the factory class we've made in HandheldFlameParticle.java.
+    // so that we can use the factory class we've made in TorchEmberParticle.java.
 
     //Helper method. Passing in the name and particle type.
     private static SimpleParticleType registerParticle(String name, SimpleParticleType particleType) {
@@ -28,5 +25,5 @@ public class ModParticles {
         //Logger isn't neccessary.
         AmbientMod.LOGGER.info("Registering particles for " + AmbientMod.MOD_ID);
     }
-    //We'll call the registerParticles() method in our AmbientMod constructor.
+    //We'll call the registerParticles() method in our AmbientMod constructor. //
 }
