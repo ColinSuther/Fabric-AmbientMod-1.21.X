@@ -9,7 +9,6 @@ import org.jetbrains.annotations.Nullable;
 
 public class TorchEmberParticle extends SpriteBillboardParticle {
 
-
     private final SpriteProvider spriteProvider;
 
     public TorchEmberParticle(ClientWorld clientWorld, double x, double y, double z,
@@ -60,60 +59,74 @@ public class TorchEmberParticle extends SpriteBillboardParticle {
         super.tick();
 
         float progress = (float) this.age / this.maxAge;
+        setSpriteForAge(this.spriteProvider); // Important for animated textures
 
-        // Color transitions:
-        if (progress < 0.25f) {
-            // White → Orange
-            float t = progress / 0.25f;
+        // === Color transitions ===
+        final float stage1 = 0.25f;
+        final float stage2 = 0.7f;
+
+        if (progress < stage1) {
+            float t = progress / stage1;
             this.red = 1.0f;
             this.green = lerp(1.0f, 0.5f, t);
             this.blue = lerp(1.0f, 0.0f, t);
-        } else if (progress < 0.7f) {
-            // Orange → Red
-            float t = (progress - 0.25f) / 0.45f;
+        } else if (progress < stage2) {
+            float t = (progress - stage1) / (stage2 - stage1);
             this.red = 1.0f;
             this.green = lerp(0.5f, 0.0f, t);
             this.blue = 0.0f;
         } else {
-            // Red → Dark Gray (shorter)
-            float t = (progress - 0.7f) / 0.3f;
+            float t = (progress - stage2) / (1.0f - stage2);
             this.red = lerp(1.0f, 0.2f, t);
             this.green = lerp(0.0f, 0.2f, t);
             this.blue = lerp(0.0f, 0.2f, t);
         }
-        /*
-        float flicker = (this.random.nextFloat() * 0.2f) + 0.5f; // Range: ~0.5 – 1.1
 
-        this.red *= flicker;
-        this.green *= flicker;
-        this.blue *= flicker;
-        */
-        // Optional fade out alpha
-        this.alpha = 1.0f - progress;
+        // === Flicker effect ===
+        float flicker = (this.random.nextFloat() * 0.2f) + 0.9f;
+        this.alpha = (1.0f - progress) * flicker;
 
-        Vec3d playerVelocity = MinecraftClient.getInstance().player.getVelocity();
-
-        // Get player and velocity
+        // === Wind push from player ===
         var player = MinecraftClient.getInstance().player;
         if (player != null) {
             double dx = this.x - player.getX();
             double dz = this.z - player.getZ();
             double distanceSq = dx * dx + dz * dz;
 
-            // Only affect particles near the player
-            if (distanceSq < 2.5) {
+            if (distanceSq < 4.0) {
                 Vec3d velocity = player.getVelocity();
-
-                // Simulate wind push
-                this.velocityX += velocity.x * 0.1;
-                this.velocityZ += velocity.z * 0.1;
+                this.velocityX += velocity.x * 0.07;
+                this.velocityZ += velocity.z * 0.07;
             }
         }
 
-        // Optional: dampen to prevent flying away forever
-        this.velocityX *= 0.96;
-        this.velocityY *= 0.96;
-        this.velocityZ *= 0.96;
+        // === Damping to prevent drifting ===
+        this.velocityX *= 0.95;
+        this.velocityY *= 0.95;
+        this.velocityZ *= 0.95;
+
+        this.scale = 0.2f + random.nextFloat() * 0.1f;
+        this.gravityStrength = -0.005f; // Gentle upward lift
+        /*
+        // === Dynamic scaling based on distance from player ===
+        if (player != null) {
+            double dx = this.x - player.getX();
+            double dy = this.y - player.getY();
+            double dz = this.z - player.getZ();
+            double distanceSq = dx * dx + dy * dy + dz * dz;
+
+            double distance = Math.sqrt(distanceSq);
+
+            // Example scaling logic: closer = small, farther = large (clamped)
+            float minScale = 0.1f;
+            float maxScale = 1.5f;
+            float scaleAtFarDistance = 32f; // distance at which particle reaches max scale
+
+            float t = (float)Math.min(distance / scaleAtFarDistance, 1.0); // normalized [0,1]
+            this.scale = lerp(minScale, maxScale, t);
+        }
+
+         */
     }
 
 }

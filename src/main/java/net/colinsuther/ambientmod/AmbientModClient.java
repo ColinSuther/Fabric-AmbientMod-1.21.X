@@ -7,10 +7,8 @@ import net.fabricmc.fabric.api.client.particle.v1.ParticleFactoryRegistry;
 
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.minecraft.block.TorchBlock;
+import net.minecraft.block.CampfireBlock;
 import net.minecraft.util.math.BlockPos;
-
-import java.util.HashSet;
-import java.util.Set;
 
 public class AmbientModClient implements ClientModInitializer{
     @Override
@@ -19,6 +17,8 @@ public class AmbientModClient implements ClientModInitializer{
         //Now we need to define what the handheld flame particle looks like. We do this in our asset folder.
         //Initialization
         TorchEmberParticleSpawner.register();
+        CampfireEmberParticleSpawner.register();
+
     }
 
     public class TorchEmberParticleSpawner {
@@ -44,6 +44,36 @@ public class AmbientModClient implements ClientModInitializer{
                             //for (int i = 0; i < 3; i++) { // Spawn 3 particles per tick
                                 client.world.addParticle(ModParticles.TORCH_EMBER_PARTICLE, x, y, z, 0, 0.01, 0);
                             //}
+                        }
+                    }
+                }
+            });
+        }
+    }
+
+    public class CampfireEmberParticleSpawner {
+        public static void register() {
+            ClientTickEvents.END_CLIENT_TICK.register(client -> {
+                if (client.world == null || client.player == null) return;
+
+                BlockPos playerPos = client.player.getBlockPos();
+                for (BlockPos pos : BlockPos.iterate(
+                        playerPos.add(-8, -2, -8),
+                        playerPos.add(8, 2, 8))) {
+
+                    if (client.world.getBlockState(pos).getBlock() instanceof CampfireBlock) {
+                        if (client.world.random.nextFloat() < 0.05f) {
+                            double x = pos.getX() + 0.5;
+                            double y = pos.getY() + 0.7;
+                            double z = pos.getZ() + 0.5;
+
+                            double dx = (client.world.random.nextDouble() - 0.5) * 0.02;
+                            double dy = client.world.random.nextDouble() * 0.02;
+                            double dz = (client.world.random.nextDouble() - 0.5) * 0.02;
+
+                            for (int i = 0; i < 3; i++) { // Spawn 3 particles per tick
+                            client.world.addParticle(ModParticles.TORCH_EMBER_PARTICLE, x, y, z, 0, 0.2, 0);
+                            }
                         }
                     }
                 }
